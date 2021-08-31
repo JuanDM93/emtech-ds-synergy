@@ -169,9 +169,14 @@ def report(process_id: int = 0):
     """
     reports logic
     """
+    def wait_input():
+        # Return
+        input('Input anything to return\n')
+        clear()
     if process_id == 0:
         print('- Globals -\n')
         ask_globals()
+        wait_input()
     else:
         print('- Unknown -\n')
 
@@ -179,4 +184,3 @@ def report(process_id: int = 0):
 # Globals
 def ask_globals():
     tester()
-    sleep(1000)
