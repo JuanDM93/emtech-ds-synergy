@@ -3,14 +3,15 @@ PROJECT 2
 This is a python based data science solution
 author: juan_dm93@hotmail.com
 """
+from utils.frontend import login
 
 
 # main program
 def main():
     """
-    report interface
+    login and report interface
     """
-    print('Start')
+    login()
 
 
 if __name__ == "__main__":
