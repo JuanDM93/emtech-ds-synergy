@@ -6,30 +6,48 @@ import csv
 
 # Read full db as DictReader
 def connect_db():
+    """
+    returns CSV DictReader of db
+    """
     csv_file = open("utils/synergy_logistics_database.csv", "r")
     return csv.DictReader(csv_file)
 
 
-def get_headers() -> list:
-    return connect_db().fieldnames
+HEADERS = connect_db().fieldnames
 
 
-def get_options(fieldname: str) -> list:
+def get_all_values(field: str) -> str:
+    """
+    returns all values from field
+    """
+    return [row[field] for row in connect_db()]
+
+
+def get_dif_values(field: str) -> list:
+    """
+    returns dif values from field
+    """
     result = []
     for row in connect_db():
-        if row[fieldname] not in result:
-            result.append(row[fieldname])
+        if row[field] not in result:
+            result.append(row[field])
     return result
 
 
-def get_total_options() -> dict:
+def get_total_dif_options() -> dict:
+    """
+    returns values per fieldnames in db
+    """
     result = {}
-    for field in get_headers():
-        result[field] = get_options(field)
+    for field in HEADERS:
+        result[field] = get_dif_values(field)
     return result
 
 
 def tester():
-    options = get_total_options()
-    for o in options:
-        print(f'{o}: {len(options[o])}')
+    options = get_total_dif_options()
+    for field in HEADERS:
+        results = options[field]
+        print(f'{field}: {len(results)}')
+        print(f'[:10] - {results[:10]}')
+        print()

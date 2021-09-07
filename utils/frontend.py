@@ -9,15 +9,16 @@ from .backend import tester
 # LOCALS
 SLEEPING = 0.5
 PRINT_SIZE = 10
-SECRETS = ['admin', 'pass']
+ADMINS = [['admin', 'pass'], ]
 
-PROCESSES = ['globals', 'other',]
+PROCESSES = ['globals', 'other', ]
 EXIT_CMDS = ['return', 'logout', 'exit']
 
 
 #################
 #   Interface   #
 #################
+
 
 def clear():
     """
@@ -27,34 +28,41 @@ def clear():
 
 
 # Login
-def login(limit: int = 3) -> bool:
+def login(limit: int = 3):
     """
     auth starter function
     """
     def ask() -> tuple:
         """
-        returns: user inputs (admin, secret)
+        returns: user inputs (user, password)
         """
-        admin = input('Input admin user: ')
-        secret = input('Password: ')
-        return (admin, secret)
+        user = input('Input username: ')
+        password = input('Password: ')
+        return (user, password)
 
-    while True:
-        (admin, secret) = ask()
-        if admin != SECRETS[0] or secret != SECRETS[1]:
-            limit -= 1
+    def print_login(limit=-1):
+        """
+        prints login result
+        """
+        if limit >= 0:
             print(f'Login failed... : {limit}\n')
         else:
             print('Login succesful!\n')
-            sleep(SLEEPING)
-            clear()
-            # Start interface service
-            interface()
+        sleep(SLEEPING)
+        clear()
 
-        # Failed logout
-        if limit == 0:
-            print('... bye')
-            return False
+    while limit > 0:
+        (user, password) = ask()
+        for admin in ADMINS:
+            if admin[0] == user and admin[-1] == password:
+                print_login()
+                # Start interface service
+                interface()
+        limit -= 1
+        print_login(limit)
+
+    # Failed logout
+    print('... bye')
 
 
 # Main
@@ -69,11 +77,12 @@ def interface():
         response = print_options(PROCESSES)
 
         # Process
-        print(separator)
-        print(f'\nINFO: Running "{PROCESSES[response]}" process\n')
-        sleep(SLEEPING)
-        report(response)
-        clear()
+        if response >= 0:
+            print(separator)
+            print(f'\nINFO: Running "{PROCESSES[response]}" process\n')
+            sleep(SLEEPING)
+            report(response)
+            clear()
 
 
 def print_options(options: list) -> int:
@@ -101,12 +110,14 @@ def print_options(options: list) -> int:
         answer = int(answer)
         if answer < 0 or answer > size - 1:
             print(f'\nWARNING: "{answer}" is not a valid option\n')
+            answer = -1
     except ValueError:
         print(f'\nERROR: Input unavailable "{answer}"\n')
         answer = -1
 
     print(separator)
     sleep(SLEEPING)
+    clear()
     return answer
 
 
