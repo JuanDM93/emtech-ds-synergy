@@ -4,50 +4,37 @@ Backend module
 import csv
 
 
-# Read full db as DictReader
-def connect_db():
+def init_db(path: str) -> dict:
     """
-    returns CSV DictReader of db
+    DB from csv to dict
     """
-    csv_file = open("utils/synergy_logistics_database.csv", "r")
-    return csv.DictReader(csv_file)
+    data = {}
+    with open(path, 'r') as db:
+        reader = csv.DictReader(db)
+        headers = reader.fieldnames
+
+        for record in reader:
+            data[record[headers[0]]] = {
+                k: v for k, v in record.items() if k != headers[0]
+            }
+    return data, headers
 
 
-HEADERS = connect_db().fieldnames
+PATH = "utils/synergy_logistics_database.csv"
+DB, HEADERS = init_db(PATH)
 
 
-def get_all_values(field: str) -> str:
+def filter_option(process: str, options: list) -> list:
     """
-    returns all values from field
-    """
-    return [row[field] for row in connect_db()]
-
-
-def get_dif_values(field: str) -> list:
-    """
-    returns dif values from field
+    Returns filtered registers by 
     """
     result = []
-    for row in connect_db():
-        if row[field] not in result:
-            result.append(row[field])
+    for r in DB.values():
+        flag = True
+        for o in options:
+            if r[process] != o:
+                flag = False
+                break
+        if flag:
+            result.append(r)
     return result
-
-
-def get_total_dif_options() -> dict:
-    """
-    returns values per fieldnames in db
-    """
-    result = {}
-    for field in HEADERS:
-        result[field] = get_dif_values(field)
-    return result
-
-
-def tester():
-    options = get_total_dif_options()
-    for field in HEADERS:
-        results = options[field]
-        print(f'{field}: {len(results)}')
-        print(f'[:10] - {results[:10]}')
-        print()

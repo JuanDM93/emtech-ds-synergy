@@ -3,15 +3,15 @@ Frontend module
 """
 import os
 from time import sleep
-from .backend import tester
+from .backend import *
 
 
 # LOCALS
-SLEEPING = 0.5
+SLEEPING = 0.4
 PRINT_SIZE = 10
 ADMINS = [['admin', 'pass'], ]
 
-PROCESSES = ['globals', 'other', ]
+PROCESSES = ['direction', 'transport_mode', 'total_value']
 EXIT_CMDS = ['return', 'logout', 'exit']
 
 
@@ -106,6 +106,7 @@ def print_options(options: list) -> int:
     if exit_status(answer):
         return len(options) + 1
     print(separator)
+
     try:
         answer = int(answer)
         if answer < 0 or answer > size - 1:
@@ -155,13 +156,41 @@ def report(process_id: int = 0):
         clear()
 
     if process_id == 0:
-        print('\n- Globals -\n')
-        ask_globals()
+        print('\n- Exports and Imports -\n')
+        ask_direction()
+        wait_input()
+    elif process_id == 1:
+        print('\n- Transport Mode -\n')
+        # ask_transport()
+        wait_input()
+    elif process_id == 2:
+        print('\n- Total Value -\n')
+        # ask_value()
         wait_input()
     else:
         print('\n- Unknown -\n')
         wait_input()
 
 
-def ask_globals():
-    tester()
+def ask_direction():
+    """
+    Print directions report
+    """
+
+    # Options loop
+    separator = '-------------------'
+    options = ['Imports', 'Exports']
+    response = print_options(options)
+    while response < 0 or response > len(options):
+        clear()
+        response = print_options(options)
+
+    print('\nThis is a directions report\n')
+    print(separator)
+    print(f'\n{options[response]}: Reading db...\n')
+
+    # print(f'{options[response]}: {len(result[options[response]])}')
+    # print(f'{result[options[response]][:10]}')
+
+    results = filter_option('direction', [options[response]])
+    print(f'r : {len(results)}')
