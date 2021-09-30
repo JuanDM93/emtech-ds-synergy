@@ -1,6 +1,6 @@
 # EMTECH DS Project 2
 
-Project 2 : Synergy Logistics (Python)
+Synergy Logistics Report (Python)
 
 ## Description
 
@@ -25,7 +25,7 @@ python ANALISIS-02-DOMINGUEZ-JUAN.py
 
 ## More info
 
-Check out the PDF file on this repo for more details
+Check out docs dir for more details
 
 ## Contributing
 

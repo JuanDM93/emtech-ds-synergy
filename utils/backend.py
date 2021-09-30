@@ -4,37 +4,71 @@ Backend module
 import csv
 
 
+PATH = "utils/synergy_logistics_database.csv"
+
+
 def init_db(path: str) -> dict:
     """
     DB from csv to dict
     """
     data = {}
+    countries = []
+    transports = []
     with open(path, 'r') as db:
         reader = csv.DictReader(db)
         headers = reader.fieldnames
-
-        for record in reader:
-            data[record[headers[0]]] = {
-                k: v for k, v in record.items() if k != headers[0]
+        for r in reader:
+            # Dict
+            data[r[headers[0]]] = {
+                k: v for k, v in r.items() if k != headers[0]
             }
-    return data, headers
+            # countries
+            if r['destination'] not in countries:
+                countries.append(r['destination'])
+            if r['origin'] not in countries:
+                countries.append(r['origin'])
+            # transports
+            if r['transport_mode'] not in transports:
+                transports.append(r['transport_mode'])
+    return data, countries, transports
 
 
-PATH = "utils/synergy_logistics_database.csv"
-DB, HEADERS = init_db(PATH)
+DB, COUNTRIES, TRANSPORTS = init_db(PATH)
 
 
-def filter_option(process: str, options: list) -> list:
+def directions():
     """
-    Returns filtered registers by 
+    # Imports - Exports
     """
-    result = []
+    exports = []
+    imports = []
     for r in DB.values():
-        flag = True
-        for o in options:
-            if r[process] != o:
-                flag = False
-                break
-        if flag:
-            result.append(r)
+        if r['direction'] == 'Imports':
+            imports.append(r)
+        else:
+            exports.append(r)
+    return exports, imports
+
+
+def transported():
+    """
+    # Transport
+    """
+    print(TRANSPORTS)
+    result = {t: [] for t in TRANSPORTS}
+    for r in DB.values():
+        result[r['transport_mode']].append(r)
     return result
+
+
+def countries():
+    """
+    # Country
+    """
+    print(COUNTRIES)
+    origin = {p: [] for p in COUNTRIES}
+    destin = {p: [] for p in COUNTRIES}
+    for r in DB.values():
+        origin[r['origin']].append(r)
+        destin[r['destination']].append(r)
+    return origin, destin

@@ -3,7 +3,7 @@ Frontend module
 """
 import os
 from time import sleep
-from .backend import *
+from .backend import directions, transported, countries
 
 
 # LOCALS
@@ -155,17 +155,18 @@ def report(process_id: int = 0):
         input('\nInput anything to return\n')
         clear()
 
+    print('\nReading db...\n')
     if process_id == 0:
         print('\n- Exports and Imports -\n')
         ask_direction()
         wait_input()
     elif process_id == 1:
         print('\n- Transport Mode -\n')
-        # ask_transport()
+        ask_transport()
         wait_input()
     elif process_id == 2:
         print('\n- Total Value -\n')
-        # ask_value()
+        ask_country()
         wait_input()
     else:
         print('\n- Unknown -\n')
@@ -174,23 +175,40 @@ def report(process_id: int = 0):
 
 def ask_direction():
     """
-    Print directions report
+    Prints directions report
+    # options = ['Imports', 'Exports']
     """
-
-    # Options loop
     separator = '-------------------'
-    options = ['Imports', 'Exports']
-    response = print_options(options)
-    while response < 0 or response > len(options):
-        clear()
-        response = print_options(options)
-
     print('\nThis is a directions report\n')
     print(separator)
-    print(f'\n{options[response]}: Reading db...\n')
 
-    # print(f'{options[response]}: {len(result[options[response]])}')
-    # print(f'{result[options[response]][:10]}')
+    results = directions()
+    print(f'Exports: {len(results[0])}')
+    print(f'Imports: {len(results[1])}')
 
-    results = filter_option('direction', [options[response]])
-    print(f'r : {len(results)}')
+
+def ask_transport():
+    """
+    Prints transports report
+    """
+    separator = '-------------------'
+    print('\nThis is a transports report\n')
+    print(separator)
+    print('\nReading db...\n')
+
+    results = transported()
+    print(f'Modes: {len(results)}')
+
+
+def ask_country():
+    """
+    Prints country report
+    """
+    separator = '-------------------'
+    print('\nThis is a transports report\n')
+    print(separator)
+    print('\nReading db...\n')
+
+    results = countries()
+    print(f'Origins: {len(results[0])}')
+    print(f'Destinations: {len(results[1])}')
