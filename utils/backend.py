@@ -54,7 +54,7 @@ def transported():
     """
     # Transport
     """
-    print(TRANSPORTS)
+    print(*TRANSPORTS, sep=',')
     result = {t: [] for t in TRANSPORTS}
     for r in DB.values():
         result[r['transport_mode']].append(r)
@@ -65,7 +65,7 @@ def countries():
     """
     # Country
     """
-    print(COUNTRIES)
+    print(*COUNTRIES, sep=',')
     origin = {p: [] for p in COUNTRIES}
     destin = {p: [] for p in COUNTRIES}
     for r in DB.values():

@@ -11,7 +11,7 @@ SLEEPING = 0.4
 PRINT_SIZE = 10
 ADMINS = [['admin', 'pass'], ]
 
-PROCESSES = ['direction', 'transport_mode', 'total_value']
+PROCESSES = ['directions', 'transports', 'countries']
 EXIT_CMDS = ['return', 'logout', 'exit']
 
 
@@ -182,9 +182,13 @@ def ask_direction():
     print('\nThis is a directions report\n')
     print(separator)
 
-    results = directions()
-    print(f'Exports: {len(results[0])}')
-    print(f'Imports: {len(results[1])}')
+    exports, imports = directions()
+
+    total_e = [int(e['total_value']) for e in exports]
+    print(f'Exports: {len(exports)} - ${sum(total_e)}')
+
+    total_i = [int(i['total_value']) for i in imports]
+    print(f'Imports: {len(imports)} - ${sum(total_i)}')
 
 
 def ask_transport():
@@ -196,8 +200,11 @@ def ask_transport():
     print(separator)
     print('\nReading db...\n')
 
+    print('Modes:')
     results = transported()
-    print(f'Modes: {len(results)}')
+    for r in results:
+        val = sum(int(val['total_value']) for val in results[r])
+        print(f'{r}: {len(results[r])} - ${val}')
 
 
 def ask_country():
@@ -209,6 +216,15 @@ def ask_country():
     print(separator)
     print('\nReading db...\n')
 
-    results = countries()
-    print(f'Origins: {len(results[0])}')
-    print(f'Destinations: {len(results[1])}')
+    origin, destin = countries()
+
+    print(f'Origins: {len(origin)}')
+    for country in origin:
+        c_total = [int(r['total_value']) for r in origin[country]]
+        print(f'{country}: ${sum(c_total)}')
+
+    print(separator)
+    print(f'Destinations: {len(destin)}')
+    for country in destin:
+        c_total = [int(r['total_value']) for r in destin[country]]
+        print(f'{country}: ${sum(c_total)}')
