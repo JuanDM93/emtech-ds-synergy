@@ -3,6 +3,7 @@ Frontend module
 """
 import os
 from time import sleep
+
 from .backend import directions, transported, countries
 
 
@@ -157,7 +158,7 @@ def report(process_id: int = 0):
 
     print('\nReading db...\n')
     if process_id == 0:
-        print('\n- Exports and Imports -\n')
+        print('\n- Imports and Exports -\n')
         ask_direction()
         wait_input()
     elif process_id == 1:
@@ -165,7 +166,7 @@ def report(process_id: int = 0):
         ask_transport()
         wait_input()
     elif process_id == 2:
-        print('\n- Total Value -\n')
+        print('\n- Country -\n')
         ask_country()
         wait_input()
     else:
@@ -185,10 +186,10 @@ def ask_direction():
     exports, imports = directions()
 
     total_e = [int(e['total_value']) for e in exports]
-    print(f'Exports: {len(exports)} - ${sum(total_e)}')
+    print(f'Exports: {len(exports):5d} - ${sum(total_e):14d}')
 
     total_i = [int(i['total_value']) for i in imports]
-    print(f'Imports: {len(imports)} - ${sum(total_i)}')
+    print(f'Imports: {len(imports):5d} - ${sum(total_i):14d}')
 
 
 def ask_transport():
@@ -198,13 +199,18 @@ def ask_transport():
     separator = '-------------------'
     print('\nThis is a transports report\n')
     print(separator)
-    print('\nReading db...\n')
 
     print('Modes:')
     results = transported()
+
+    toprint = []
     for r in results:
-        val = sum(int(val['total_value']) for val in results[r])
-        print(f'{r}: {len(results[r])} - ${val}')
+        result = sum(int(val['total_value']) for val in results[r])
+        toprint.append([r, len(results[r]), result])
+    toprint.sort(key=lambda p: p[-1], reverse=True)
+
+    for t in toprint:
+        print(f'{t[0]:5s} - {t[1]:6d}: ${t[-1]:15d}.00')
 
 
 def ask_country():
@@ -214,17 +220,16 @@ def ask_country():
     separator = '-------------------'
     print('\nThis is a transports report\n')
     print(separator)
-    print('\nReading db...\n')
 
     origin, destin = countries()
 
     print(f'Origins: {len(origin)}')
     for country in origin:
         c_total = [int(r['total_value']) for r in origin[country]]
-        print(f'{country}: ${sum(c_total)}')
+        print(f'{country:20s}: ${sum(c_total):12d}')
 
     print(separator)
     print(f'Destinations: {len(destin)}')
     for country in destin:
         c_total = [int(r['total_value']) for r in destin[country]]
-        print(f'{country}: ${sum(c_total)}')
+        print(f'{country:20s}: ${sum(c_total):12d}')
