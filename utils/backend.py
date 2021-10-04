@@ -40,13 +40,8 @@ def directions():
     """
     # Imports - Exports
     """
-    exports = []
-    imports = []
-    for r in DB.values():
-        if r['direction'] == 'Imports':
-            imports.append(r)
-        else:
-            exports.append(r)
+    exports = [r for r in DB.values() if r['direction'] == 'Exports']
+    imports = [r for r in DB.values() if r['direction'] == 'Imports']
     return exports, imports
 
 
@@ -54,19 +49,22 @@ def transported():
     """
     # Transport
     """
-    result = {t: [] for t in TRANSPORTS}
-    for r in DB.values():
-        result[r['transport_mode']].append(r)
-    return result
+    return {
+        t: [
+            r for r in DB.values() if t == r['transport_mode']
+        ] for t in TRANSPORTS
+    }
 
 
 def countries():
     """
     # Country
     """
-    origin = {p: [] for p in COUNTRIES}
-    destin = {p: [] for p in COUNTRIES}
-    for r in DB.values():
-        origin[r['origin']].append(r)
-        destin[r['destination']].append(r)
+    origin = {
+        p: [r for r in DB.values() if p == r['origin']] for p in COUNTRIES
+    }
+
+    destin = {
+        p: [r for r in DB.values() if p == r['destination']] for p in COUNTRIES
+    }
     return origin, destin

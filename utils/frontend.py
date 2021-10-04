@@ -181,7 +181,7 @@ def ask_direction():
     """
     def print_direction(results):
         totals = [int(r['total_value']) for r in results]
-        print(f'{len(exports):5d} - ${sum(totals):14d}')
+        print(f'{len(results):5d}: ${sum(totals):14d}.00')
 
     separator = '-------------------'
     print('\nThis is a directions report\n')
@@ -206,7 +206,6 @@ def ask_transport():
     print('\nThis is a transports report\n')
     print(separator)
 
-    print('Modes:')
     results = transported()
 
     toprint = []
@@ -216,7 +215,7 @@ def ask_transport():
     toprint.sort(key=lambda p: p[-1], reverse=True)
 
     for t in toprint:
-        print(f'{t[0]:5s} - {t[1]:5d}: ${t[-1]:12d}.00')
+        print(f'{t[0]:5s} - {t[1]:5d}: ${t[-1]:14d}.00')
 
 
 def ask_country():
@@ -230,8 +229,7 @@ def ask_country():
             toprint.append([country, sum(c_total)])
         toprint.sort(key=lambda i: i[-1], reverse=True)
         for p in toprint:
-            print(f'{p[0]:20s}: ${p[-1]:15}.00')
-        #print(f'Totals: ${sum([p[-1] for p in toprint]):20}.00')
+            print(f'{p[0]:20s} ${p[-1]:12d}.00')
 
     separator = '-------------------'
     print('\nThis is a countries report\n')
