@@ -179,17 +179,23 @@ def ask_direction():
     Prints directions report
     # options = ['Imports', 'Exports']
     """
+    def print_direction(results):
+        totals = [int(r['total_value']) for r in results]
+        print(f'{len(exports):5d} - ${sum(totals):14d}')
+
     separator = '-------------------'
     print('\nThis is a directions report\n')
     print(separator)
 
     exports, imports = directions()
 
-    total_e = [int(e['total_value']) for e in exports]
-    print(f'Exports: {len(exports):5d} - ${sum(total_e):14d}')
+    print('Exports')
+    print_direction(exports)
 
-    total_i = [int(i['total_value']) for i in imports]
-    print(f'Imports: {len(imports):5d} - ${sum(total_i):14d}')
+    print(separator)
+
+    print('Imports')
+    print_direction(imports)
 
 
 def ask_transport():
@@ -210,26 +216,33 @@ def ask_transport():
     toprint.sort(key=lambda p: p[-1], reverse=True)
 
     for t in toprint:
-        print(f'{t[0]:5s} - {t[1]:6d}: ${t[-1]:15d}.00')
+        print(f'{t[0]:5s} - {t[1]:5d}: ${t[-1]:12d}.00')
 
 
 def ask_country():
     """
     Prints country report
     """
+    def print_route(routes):
+        toprint = []
+        for country in routes:
+            c_total = [int(r['total_value']) for r in routes[country]]
+            toprint.append([country, sum(c_total)])
+        toprint.sort(key=lambda i: i[-1], reverse=True)
+        for p in toprint:
+            print(f'{p[0]:20s}: ${p[-1]:15}.00')
+        #print(f'Totals: ${sum([p[-1] for p in toprint]):20}.00')
+
     separator = '-------------------'
-    print('\nThis is a transports report\n')
+    print('\nThis is a countries report\n')
     print(separator)
 
     origin, destin = countries()
 
-    print(f'Origins: {len(origin)}')
-    for country in origin:
-        c_total = [int(r['total_value']) for r in origin[country]]
-        print(f'{country:20s}: ${sum(c_total):12d}')
+    print(f'Origins:\n')
+    print_route(origin)
 
     print(separator)
-    print(f'Destinations: {len(destin)}')
-    for country in destin:
-        c_total = [int(r['total_value']) for r in destin[country]]
-        print(f'{country:20s}: ${sum(c_total):12d}')
+
+    print(f'Destinations:\n')
+    print_route(destin)
