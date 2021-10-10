@@ -192,19 +192,17 @@ def ask_direction():
         for c in items[:PRINT_SIZE]:
             cont = c[-1]['cont']
             c_prcnt = 100 * cont/c_total
-            acum += c_prcnt
+            acum += cont
             c_acum = 100 * acum/c_total
-            prcnt = f"{c_prcnt:5.02f}% :{c_acum:5.02f}%"
+            prcnt = f"{c_prcnt:5.02f}% - {c_acum:5.02f}%"
 
-            value = f"{c[-1]['value']:12d}"
-            route = f"${c[0]:27s}"
-            print(f"{route}: {cont:3d} - {value}, {prcnt}")
+            route = f"{c[0]:27s}"
+            print(f"{route} - {cont:3d}: {prcnt}")
 
     separator = '-------------------'
     print('\nThis is a directions report\n')
     print(separator)
 
-    # Directions loop
     options = ['Imports', 'Exports']
     response = options_loop(options)
 
@@ -231,17 +229,13 @@ def ask_transport():
             value = c[-1]['value']
 
             c_prcnt = 100*cont/t_cont
-            c_prcnt = f"C: {c_prcnt:5.02f}%"
+            s_cont = f"{cont:6d}: {c_prcnt:5.02f}%"
 
             v_prcnt = 100*value/t_value
-            v_prcnt = f"V: {v_prcnt:5.02f}%"
+            s_value = f"${value:14d}: {v_prcnt:5.02f}%"
 
-            prcnt = c_prcnt + ", " + v_prcnt
-
-            s_value = f"${value:14d}"
-            s_cont = f"{cont:6d}"
             travel = f"{c[0]:5s}"
-            print(f"{travel} ({s_cont}) - {s_value}, {prcnt}")
+            print(f"{travel} ({s_cont}) - {s_value}")
 
     separator = '-------------------'
     print('\nThis is a transports report\n')
@@ -250,6 +244,8 @@ def ask_transport():
     options = ['Globals', 'Imports', 'Exports']
     response = options_loop(options)
 
+    print(f'\n{response} report\n')
+    print(separator)
     transported = get_transported(response)
 
     print('Count sorted\n')
@@ -275,6 +271,8 @@ def ask_country():
     options = ['Globals', 'Imports', 'Exports']
     response = options_loop(options)
 
+    print(f'\n{response} report\n')
+    print(separator)
     count_countries = get_countries(response)
 
     result = custom_sort(count_countries, 't_value')
@@ -285,10 +283,10 @@ def ask_country():
     for r in result:
 
         orig = r[-1]['origin']
-        o = f"Org: {orig['cont']:4d}, ${orig['value']:12d}"
+        o = f"Org ({orig['cont']:4d}) :${orig['value']:12d}"
 
         dest = r[-1]['dest']
-        d = f"Dst: {dest['cont']:4d}, ${dest['value']:12d}"
+        d = f"Dst ({dest['cont']:4d}) :${dest['value']:12d}"
 
         t_count = r[-1]['t_count']
         s_cont = 100 * t_count/total_c
@@ -300,10 +298,10 @@ def ask_country():
         acum_val += t_value
         p_value = 100*acum_val/total_v
 
-        counts = f"{t_count:4d} - {s_cont:5.02f}% :{p_cont:5.02f}%"
-        values = f"${t_value:12d} - {s_value:5.02f}%: {p_value:5.02f}%"
+        counts = f"({t_count:4d} {s_cont:5.02f}% :{p_cont:5.02f}%)"
+        values = f"${t_value:12d} {s_value:5.02f}% :{p_value:5.02f}%"
 
-        msg = f"{r[0]:21s} - {o}, {d}, C: {counts}, V: {values}"
+        msg = f"{r[0]:21s} {counts} - {values} - {o} - {d}"
 
         print(msg)
 
