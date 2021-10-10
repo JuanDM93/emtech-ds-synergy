@@ -51,14 +51,14 @@ def get_directions(direction: str = 'Imports', data=DB) -> dict:
     return res_routes
 
 
-def get_transported(direction: str = None, data=DB) -> dict:
+def get_transported(direction: str, data=DB) -> dict:
     """
     Transport
     """
     transports = []
     transported = {}
     for d in data:
-        if direction != None:
+        if direction != 'Globals':
             if data[d]['direction'] != direction:
                 continue
         transport = data[d]['transport_mode']
@@ -74,7 +74,7 @@ def get_transported(direction: str = None, data=DB) -> dict:
     return transported
 
 
-def get_countries(direction: str = None, data=DB) -> dict:
+def get_countries(direction: str, data=DB) -> dict:
     """
     Country
     """
@@ -82,7 +82,7 @@ def get_countries(direction: str = None, data=DB) -> dict:
     countries_dict = {}
 
     for d in data:
-        if direction != None:
+        if direction != 'Globals':
             if data[d]['direction'] != direction:
                 continue
         origin = data[d]['origin']

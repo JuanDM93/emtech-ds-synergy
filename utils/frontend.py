@@ -177,20 +177,17 @@ def ask_direction():
     """
     def print_direction(items):
         c_total = sum([c[-1]['cont'] for c in items])
-        v_total = sum([c[-1]['value'] for c in items])
-
         acum = 0
         for c in items[:PRINT_SIZE]:
-            value = c[-1]['value']
-
             cont = c[-1]['cont']
             c_prcnt = 100 * cont/c_total
             acum += c_prcnt
             c_acum = 100 * acum/c_total
             prcnt = f"{c_prcnt:5.02f}% :{c_acum:5.02f}%"
 
-            route = f"{c[0]:27s}"
-            print(f"{route}: {cont:3d} - ${value:12d}, {prcnt}")
+            value = f"{c[-1]['value']:12d}"
+            route = f"${c[0]:27s}"
+            print(f"{route}: {cont:3d} - {value}, {prcnt}")
 
     separator = '-------------------'
     print('\nThis is a directions report\n')
@@ -243,10 +240,15 @@ def ask_transport():
     print('\nThis is a transports report\n')
     print(separator)
 
-    transported = get_transported()
-    # TODO: options loop
-    import_transport = get_transported('Imports')
-    export_transport = get_transported('Exports')
+    # Directions loop
+    options = ['Globals', 'Imports', 'Exports']
+    response = print_options(options)
+    while response < 0 or response > len(options):
+        clear()
+        response = print_options(options)
+    response = options[response]
+
+    transported = get_transported(response)
 
     print('Count sorted\n')
     conts = custom_sort(transported, 'cont')
@@ -268,10 +270,15 @@ def ask_country():
     print('\nThis is a countries report\n')
     print(separator)
 
-    count_countries = get_countries()
-    # TODO: options loop
-    import_countries = get_countries('Imports')
-    export_countries = get_countries('Exports')
+    # Directions loop
+    options = ['Globals', 'Imports', 'Exports']
+    response = print_options(options)
+    while response < 0 or response > len(options):
+        clear()
+        response = print_options(options)
+    response = options[response]
+
+    count_countries = get_countries(response)
 
     result = custom_sort(count_countries, 't_value')
 
