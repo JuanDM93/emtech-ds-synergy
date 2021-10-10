@@ -16,7 +16,7 @@ def init_db(path: str) -> dict:
         reader = DictReader(db)
         for r in reader:
             data[r['register_id']] = {
-                k: v for k, v in r.items()  # if k != 'register_id'
+                k: v for k, v in r.items()
             }
     return data
 
@@ -24,9 +24,9 @@ def init_db(path: str) -> dict:
 DB = init_db(PATH)
 
 
-def get_directions(direction: str = 'Imports', data=DB):
+def get_directions(direction: str = 'Imports', data=DB) -> dict:
     """
-    Imports - Exports report
+    Imports - Exports
     """
     imports = []
     exports = []
@@ -51,13 +51,16 @@ def get_directions(direction: str = 'Imports', data=DB):
     return res_routes
 
 
-def get_transported(data=DB) -> dict:
+def get_transported(direction: str = None, data=DB) -> dict:
     """
     Transport
     """
     transports = []
     transported = {}
     for d in data:
+        if direction != None:
+            if data[d]['direction'] != direction:
+                continue
         transport = data[d]['transport_mode']
         if transport not in transports:
             transports.append(transport)
@@ -71,13 +74,17 @@ def get_transported(data=DB) -> dict:
     return transported
 
 
-def get_countries(data=DB):
+def get_countries(direction: str = None, data=DB) -> dict:
     """
     Country
     """
     countries = []
     countries_dict = {}
+
     for d in data:
+        if direction != None:
+            if data[d]['direction'] != direction:
+                continue
         origin = data[d]['origin']
         if origin not in countries:
             countries.append(origin)
@@ -116,7 +123,10 @@ def get_countries(data=DB):
     return count_countries
 
 
-def custom_sort(data: dict, key: str):
+def custom_sort(data: dict, key: str) -> dict:
+    """
+    Custom sorts dict from key
+    """
     return sorted(
         data.items(),
         reverse=True,

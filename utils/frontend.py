@@ -150,9 +150,6 @@ def report(process_id: int = 0):
     reports logic
     """
     def wait_input():
-        """
-        Return
-        """
         input('\nInput anything to return\n')
         clear()
 
@@ -178,12 +175,22 @@ def ask_direction():
     """
     Prints directions report
     """
-    def print_direction(items: list):
+    def print_direction(items):
+        c_total = sum([c[-1]['cont'] for c in items])
+        v_total = sum([c[-1]['value'] for c in items])
+
+        acum = 0
         for c in items[:PRINT_SIZE]:
+            value = c[-1]['value']
+
+            cont = c[-1]['cont']
+            c_prcnt = 100 * cont/c_total
+            acum += c_prcnt
+            c_acum = 100 * acum/c_total
+            prcnt = f"{c_prcnt:5.02f}% :{c_acum:5.02f}%"
+
             route = f"{c[0]:27s}"
-            cont = f"{c[-1]['cont']:3d}"
-            value = f"{c[-1]['value']:12d}"
-            print(f"{route}: {cont} - ${value}")
+            print(f"{route}: {cont:3d} - ${value:12d}, {prcnt}")
 
     separator = '-------------------'
     print('\nThis is a directions report\n')
@@ -196,6 +203,7 @@ def ask_direction():
         clear()
         response = print_options(options)
     response = options[response]
+
     print(f'\n{response} report\n')
     print(separator)
     res_routes = get_directions(response)
@@ -204,28 +212,41 @@ def ask_direction():
     print('Count sorted\n')
     print_direction(conts)
 
-    print(separator)
-
-    print('Value sorted\n')
-    values = custom_sort(res_routes, 'value')
-    print_direction(values)
-
 
 def ask_transport():
     """
     Prints transports report
     """
     def print_transport(items):
-        for i in items:
-            travel = f"{i[0]:5s}"
-            cont = f"{i[-1]['cont']:6d}"
-            value = f"{i[-1]['value']:14d}"
-            print(f"{travel} ({cont}) - ${value}")
+        t_value = sum([c[-1]['value'] for c in items])
+        t_cont = sum([c[-1]['cont'] for c in items])
+
+        for c in items:
+            cont = c[-1]['cont']
+
+            value = c[-1]['value']
+
+            c_prcnt = 100*cont/t_cont
+            c_prcnt = f"C: {c_prcnt:5.02f}%"
+
+            v_prcnt = 100*value/t_value
+            v_prcnt = f"V: {v_prcnt:5.02f}%"
+
+            prcnt = c_prcnt + ", " + v_prcnt
+
+            s_value = f"${value:14d}"
+            s_cont = f"{cont:6d}"
+            travel = f"{c[0]:5s}"
+            print(f"{travel} ({s_cont}) - {s_value}, {prcnt}")
 
     separator = '-------------------'
     print('\nThis is a transports report\n')
     print(separator)
+
     transported = get_transported()
+    # TODO: options loop
+    import_transport = get_transported('Imports')
+    export_transport = get_transported('Exports')
 
     print('Count sorted\n')
     conts = custom_sort(transported, 'cont')
@@ -242,32 +263,44 @@ def ask_country():
     """
     Prints country report
     """
-    LIM = 0.8
+    LIM = 80
     separator = '-------------------'
     print('\nThis is a countries report\n')
     print(separator)
-    count_countries = get_countries()
 
-    result = custom_sort(count_countries, 't_count')
+    count_countries = get_countries()
+    # TODO: options loop
+    import_countries = get_countries('Imports')
+    export_countries = get_countries('Exports')
+
+    result = custom_sort(count_countries, 't_value')
 
     total_v = sum([r[-1]['t_value'] for r in result])
     total_c = sum([r[-1]['t_count'] for r in result])
     acum_val, acum_cont = 0, 0
     for r in result:
-        orig = r[-1]['origin']
-        dest = r[-1]['dest']
-        t_count = r[-1]['t_count']
-        acum_cont += t_count
-        t_value = r[-1]['t_value']
-        acum_val += t_value
-        s_value = round(t_value/total_v, 2)
-        p_value = round(acum_val/total_v, 2)
-        s_cont = round(t_count/total_c, 2)
-        p_cont = round(acum_cont/total_c, 2)
 
+        orig = r[-1]['origin']
         o = f"Org: {orig['cont']:4d}, ${orig['value']:12d}"
+
+        dest = r[-1]['dest']
         d = f"Dst: {dest['cont']:4d}, ${dest['value']:12d}"
-        msg = f"{r[0]:18s} - {o}, {d}, C: {t_count:4d} - {s_cont:.02f}% :{p_cont:.02f}%, V: {t_value:12d} - {s_value:.02f}%: {p_value:.02f}%"
+
+        t_count = r[-1]['t_count']
+        s_cont = 100 * t_count/total_c
+        acum_cont += t_count
+        p_cont = 100 * acum_cont/total_c
+
+        t_value = r[-1]['t_value']
+        s_value = 100*t_value/total_v
+        acum_val += t_value
+        p_value = 100*acum_val/total_v
+
+        counts = f"{t_count:4d} - {s_cont:5.02f}% :{p_cont:5.02f}%"
+        values = f"${t_value:12d} - {s_value:5.02f}%: {p_value:5.02f}%"
+
+        msg = f"{r[0]:21s} - {o}, {d}, C: {counts}, V: {values}"
+
         print(msg)
 
         if p_value > LIM:
