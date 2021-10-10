@@ -194,10 +194,10 @@ def ask_direction():
             c_prcnt = 100 * cont/c_total
             acum += cont
             c_acum = 100 * acum/c_total
-            prcnt = f"{c_prcnt:5.02f}% - {c_acum:5.02f}%"
+            prcnt = f"{c_prcnt:5.02f}%: {c_acum:5.02f}%"
 
             route = f"{c[0]:27s}"
-            print(f"{route} - {cont:3d}: {prcnt}")
+            print(f"{route}({cont:3d}) - {prcnt}")
 
     separator = '-------------------'
     print('\nThis is a directions report\n')
@@ -229,10 +229,10 @@ def ask_transport():
             value = c[-1]['value']
 
             c_prcnt = 100*cont/t_cont
-            s_cont = f"{cont:6d}: {c_prcnt:5.02f}%"
+            s_cont = f"{cont:5d}: {c_prcnt:5.02f}%"
 
             v_prcnt = 100*value/t_value
-            s_value = f"${value:14d}: {v_prcnt:5.02f}%"
+            s_value = f"${value:12d}: {v_prcnt:5.02f}%"
 
             travel = f"{c[0]:5s}"
             print(f"{travel} ({s_cont}) - {s_value}")
@@ -283,10 +283,10 @@ def ask_country():
     for r in result:
 
         orig = r[-1]['origin']
-        o = f"Org ({orig['cont']:4d}) :${orig['value']:12d}"
+        o = f"Org ({orig['cont']:4d}): ${orig['value']:12d}"
 
         dest = r[-1]['dest']
-        d = f"Dst ({dest['cont']:4d}) :${dest['value']:12d}"
+        d = f"Dst ({dest['cont']:4d}): ${dest['value']:12d}"
 
         t_count = r[-1]['t_count']
         s_cont = 100 * t_count/total_c
@@ -298,11 +298,9 @@ def ask_country():
         acum_val += t_value
         p_value = 100*acum_val/total_v
 
-        counts = f"({t_count:4d} {s_cont:5.02f}% :{p_cont:5.02f}%)"
-        values = f"${t_value:12d} {s_value:5.02f}% :{p_value:5.02f}%"
-
-        msg = f"{r[0]:21s} {counts} - {values} - {o} - {d}"
-
+        counts = f"({t_count:4d} - {s_cont:5.02f}%: {p_cont:5.02f}%)"
+        values = f"${t_value:12d} - {s_value:5.02f}%: {p_value:5.02f}%"
+        msg = f"{r[0]:21s} {counts}, {values}, {o}, {d}"
         print(msg)
 
         if p_value > LIM:
