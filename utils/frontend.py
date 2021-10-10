@@ -4,7 +4,7 @@ Frontend module
 import os
 from time import sleep
 
-from .backend import directions, transported, countries
+from .backend import get_directions, get_transported, get_countries, custom_sort
 
 
 # LOCALS
@@ -177,70 +177,98 @@ def report(process_id: int = 0):
 def ask_direction():
     """
     Prints directions report
-    # options = ['Imports', 'Exports']
     """
-    def print_direction(results):
-        totals = [int(r['total_value']) for r in results]
-        print(f'{len(results):5d}: ${sum(totals):14d}.00')
+    def print_direction(items: list):
+        for c in items[:PRINT_SIZE]:
+            route = f"{c[0]:27s}"
+            cont = f"{c[-1]['cont']:3d}"
+            value = f"{c[-1]['value']:12d}"
+            print(f"{route}: {cont} - ${value}")
 
     separator = '-------------------'
     print('\nThis is a directions report\n')
     print(separator)
 
-    exports, imports = directions()
+    # Directions loop
+    options = ['Imports', 'Exports']
+    response = print_options(options)
+    while response < 0 or response > len(options):
+        clear()
+        response = print_options(options)
+    response = options[response]
+    print(f'\n{response} report\n')
+    print(separator)
+    res_routes = get_directions(response)
 
-    print('Exports')
-    print_direction(exports)
+    conts = custom_sort(res_routes, 'cont')
+    print('Count sorted\n')
+    print_direction(conts)
 
     print(separator)
 
-    print('Imports')
-    print_direction(imports)
+    print('Value sorted\n')
+    values = custom_sort(res_routes, 'value')
+    print_direction(values)
 
 
 def ask_transport():
     """
     Prints transports report
     """
+    def print_transport(items):
+        for i in items:
+            travel = f"{i[0]:5s}"
+            cont = f"{i[-1]['cont']:6d}"
+            value = f"{i[-1]['value']:14d}"
+            print(f"{travel} ({cont}) - ${value}")
+
     separator = '-------------------'
     print('\nThis is a transports report\n')
     print(separator)
+    transported = get_transported()
 
-    results = transported()
+    print('Count sorted\n')
+    conts = custom_sort(transported, 'cont')
+    print_transport(conts)
 
-    toprint = []
-    for r in results:
-        result = sum(int(val['total_value']) for val in results[r])
-        toprint.append([r, len(results[r]), result])
-    toprint.sort(key=lambda p: p[-1], reverse=True)
+    print(separator)
 
-    for t in toprint:
-        print(f'{t[0]:5s} - {t[1]:5d}: ${t[-1]:14d}.00')
+    print('Value sorted\n')
+    values = custom_sort(transported, 'value')
+    print_transport(values)
 
 
 def ask_country():
     """
     Prints country report
     """
-    def print_route(routes):
-        toprint = []
-        for country in routes:
-            c_total = [int(r['total_value']) for r in routes[country]]
-            toprint.append([country, sum(c_total)])
-        toprint.sort(key=lambda i: i[-1], reverse=True)
-        for p in toprint:
-            print(f'{p[0]:20s} ${p[-1]:12d}.00')
-
+    LIM = 0.8
     separator = '-------------------'
     print('\nThis is a countries report\n')
     print(separator)
+    count_countries = get_countries()
 
-    origin, destin = countries()
+    result = custom_sort(count_countries, 't_count')
 
-    print(f'Origins:\n')
-    print_route(origin)
+    total_v = sum([r[-1]['t_value'] for r in result])
+    total_c = sum([r[-1]['t_count'] for r in result])
+    acum_val, acum_cont = 0, 0
+    for r in result:
+        orig = r[-1]['origin']
+        dest = r[-1]['dest']
+        t_count = r[-1]['t_count']
+        acum_cont += t_count
+        t_value = r[-1]['t_value']
+        acum_val += t_value
+        s_value = round(t_value/total_v, 2)
+        p_value = round(acum_val/total_v, 2)
+        s_cont = round(t_count/total_c, 2)
+        p_cont = round(acum_cont/total_c, 2)
 
-    print(separator)
+        o = f"Org: {orig['cont']:4d}, ${orig['value']:12d}"
+        d = f"Dst: {dest['cont']:4d}, ${dest['value']:12d}"
+        msg = f"{r[0]:18s} - {o}, {d}, C: {t_count:4d} - {s_cont:.02f}% :{p_cont:.02f}%, V: {t_value:12d} - {s_value:.02f}%: {p_value:.02f}%"
+        print(msg)
 
-    print(f'Destinations:\n')
-    print_route(destin)
+        if p_value > LIM:
+            break

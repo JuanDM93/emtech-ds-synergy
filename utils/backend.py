@@ -1,7 +1,7 @@
 """
 Backend module
 """
-import csv
+from csv import DictReader
 
 
 PATH = "utils/synergy_logistics_database.csv"
@@ -12,59 +12,113 @@ def init_db(path: str) -> dict:
     DB from csv to dict
     """
     data = {}
-    countries = []
-    transports = []
     with open(path, 'r') as db:
-        reader = csv.DictReader(db)
-        headers = reader.fieldnames
+        reader = DictReader(db)
         for r in reader:
-            # Dict
-            data[r[headers[0]]] = {
-                k: v for k, v in r.items() if k != headers[0]
+            data[r['register_id']] = {
+                k: v for k, v in r.items()  # if k != 'register_id'
             }
-            # countries
-            if r['destination'] not in countries:
-                countries.append(r['destination'])
-            if r['origin'] not in countries:
-                countries.append(r['origin'])
-            # transports
-            if r['transport_mode'] not in transports:
-                transports.append(r['transport_mode'])
-    return data, countries, transports
+    return data
 
 
-DB, COUNTRIES, TRANSPORTS = init_db(PATH)
+DB = init_db(PATH)
 
 
-def directions():
+def get_directions(direction: str = 'Imports', data=DB):
     """
-    # Imports - Exports
+    Imports - Exports report
     """
-    exports = [r for r in DB.values() if r['direction'] == 'Exports']
-    imports = [r for r in DB.values() if r['direction'] == 'Imports']
-    return exports, imports
+    imports = []
+    exports = []
+    for d in data:
+        if data[d]['direction'] == direction:
+            imports.append(data[d])
+        else:
+            exports.append(data[d])
+
+    routes = []
+    res_routes = {}
+    for r in imports:
+        route = f"{r['origin']}-{r['destination']}"
+        if route not in routes:
+            routes.append(route)
+            res_routes[route] = {
+                'cont': 0,
+                'value': 0,
+            }
+        res_routes[route]['cont'] += 1
+        res_routes[route]['value'] += int(r['total_value'])
+    return res_routes
 
 
-def transported():
+def get_transported(data=DB) -> dict:
     """
-    # Transport
+    Transport
     """
-    return {
-        t: [
-            r for r in DB.values() if t == r['transport_mode']
-        ] for t in TRANSPORTS
-    }
+    transports = []
+    transported = {}
+    for d in data:
+        transport = data[d]['transport_mode']
+        if transport not in transports:
+            transports.append(transport)
+            transported[transport] = {
+                'cont': 0,
+                'value': 0,
+            }
+        transported[transport]['cont'] += 1
+        transported[transport]['value'] += int(data[d]['total_value'])
+
+    return transported
 
 
-def countries():
+def get_countries(data=DB):
     """
-    # Country
+    Country
     """
-    origin = {
-        p: [r for r in DB.values() if p == r['origin']] for p in COUNTRIES
-    }
+    countries = []
+    countries_dict = {}
+    for d in data:
+        origin = data[d]['origin']
+        if origin not in countries:
+            countries.append(origin)
+            countries_dict[origin] = {
+                'origin': [],
+                'destination': [],
+            }
+        countries_dict[origin]['origin'].append(data[d])
+        destin = data[d]['destination']
+        if destin not in countries:
+            countries.append(destin)
+            countries_dict[destin] = {
+                'origin': [],
+                'destination': [],
+            }
+        countries_dict[destin]['destination'].append(data[d])
 
-    destin = {
-        p: [r for r in DB.values() if p == r['destination']] for p in COUNTRIES
-    }
-    return origin, destin
+    count_countries = {}
+    for c in countries_dict:
+        dest = {'cont': 0, 'value': 0}
+        for r in countries_dict[c]['destination']:
+            dest['cont'] += 1
+            dest['value'] += int(r['total_value'])
+        orig = {'cont': 0, 'value': 0}
+        for r in countries_dict[c]['origin']:
+            orig['cont'] += 1
+            orig['value'] += int(r['total_value'])
+        t_count = orig['cont'] + dest['cont']
+        t_value = orig['value'] + dest['value']
+        count_countries[c] = {
+            'origin': orig,
+            'dest': dest,
+            't_count': t_count,
+            't_value': t_value,
+        }
+    return count_countries
+
+
+def custom_sort(data: dict, key: str):
+    return sorted(
+        data.items(),
+        reverse=True,
+        key=lambda item: item[-1][key]
+    )
