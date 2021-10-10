@@ -171,6 +171,17 @@ def report(process_id: int = 0):
         wait_input()
 
 
+def options_loop(options: list) -> str:
+    """
+    Directions loop
+    """
+    response = print_options(options)
+    while response < 0 or response > len(options):
+        clear()
+        response = print_options(options)
+    return options[response]
+
+
 def ask_direction():
     """
     Prints directions report
@@ -195,11 +206,7 @@ def ask_direction():
 
     # Directions loop
     options = ['Imports', 'Exports']
-    response = print_options(options)
-    while response < 0 or response > len(options):
-        clear()
-        response = print_options(options)
-    response = options[response]
+    response = options_loop(options)
 
     print(f'\n{response} report\n')
     print(separator)
@@ -240,13 +247,8 @@ def ask_transport():
     print('\nThis is a transports report\n')
     print(separator)
 
-    # Directions loop
     options = ['Globals', 'Imports', 'Exports']
-    response = print_options(options)
-    while response < 0 or response > len(options):
-        clear()
-        response = print_options(options)
-    response = options[response]
+    response = options_loop(options)
 
     transported = get_transported(response)
 
@@ -270,13 +272,8 @@ def ask_country():
     print('\nThis is a countries report\n')
     print(separator)
 
-    # Directions loop
     options = ['Globals', 'Imports', 'Exports']
-    response = print_options(options)
-    while response < 0 or response > len(options):
-        clear()
-        response = print_options(options)
-    response = options[response]
+    response = options_loop(options)
 
     count_countries = get_countries(response)
 
