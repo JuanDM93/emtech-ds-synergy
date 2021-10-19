@@ -130,12 +130,11 @@ def exit_status(answer: str) -> bool:
     if answer == EXIT_CMDS[-1]:
         exit()
     else:
+        clear()
         if answer == EXIT_CMDS[1]:
-            clear()
             login()
             return True
         if answer == EXIT_CMDS[0]:
-            clear()
             interface()
         return False
 
@@ -187,6 +186,9 @@ def ask_direction():
     Prints directions report
     """
     def print_direction(items):
+        """
+        directions printer
+        """
         c_total = sum([c[-1]['cont'] for c in items])
         acum = 0
         for c in items[:PRINT_SIZE]:
@@ -220,6 +222,9 @@ def ask_transport():
     Prints transports report
     """
     def print_transport(items):
+        """
+        transports printer
+        """
         t_value = sum([c[-1]['value'] for c in items])
         t_cont = sum([c[-1]['cont'] for c in items])
 
@@ -294,9 +299,9 @@ def ask_country():
         p_cont = 100 * acum_cont/total_c
 
         t_value = r[-1]['t_value']
-        s_value = 100*t_value/total_v
+        s_value = 100 * t_value/total_v
         acum_val += t_value
-        p_value = 100*acum_val/total_v
+        p_value = 100 * acum_val/total_v
 
         counts = f"({t_count:4d} - {s_cont:5.02f}%: {p_cont:5.02f}%)"
         values = f"${t_value:12d} - {s_value:5.02f}%: {p_value:5.02f}%"

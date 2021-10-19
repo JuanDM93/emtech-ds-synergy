@@ -83,8 +83,9 @@ def get_countries(direction: str, data=DB) -> dict:
 
     for d in data:
         if direction != 'Globals':
-            if data[d]['direction'] != direction:
+            if direction != data[d]['direction']:
                 continue
+
         origin = data[d]['origin']
         if origin not in countries:
             countries.append(origin)
@@ -93,6 +94,7 @@ def get_countries(direction: str, data=DB) -> dict:
                 'destination': [],
             }
         countries_dict[origin]['origin'].append(data[d])
+
         destin = data[d]['destination']
         if destin not in countries:
             countries.append(destin)
@@ -104,16 +106,20 @@ def get_countries(direction: str, data=DB) -> dict:
 
     count_countries = {}
     for c in countries_dict:
+
         dest = {'cont': 0, 'value': 0}
         for r in countries_dict[c]['destination']:
             dest['cont'] += 1
             dest['value'] += int(r['total_value'])
+
         orig = {'cont': 0, 'value': 0}
         for r in countries_dict[c]['origin']:
             orig['cont'] += 1
             orig['value'] += int(r['total_value'])
+
         t_count = orig['cont'] + dest['cont']
         t_value = orig['value'] + dest['value']
+
         count_countries[c] = {
             'origin': orig,
             'dest': dest,
