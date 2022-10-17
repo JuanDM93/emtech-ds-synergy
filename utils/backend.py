@@ -1,26 +1,9 @@
 """
 Backend module
 """
-from csv import DictReader
-
+from utils.db import init_db
 
 PATH = "utils/synergy_logistics_database.csv"
-
-
-def init_db(path: str) -> dict:
-    """
-    DB from csv to dict
-    """
-    data = {}
-    with open(path, 'r') as db:
-        reader = DictReader(db)
-        for r in reader:
-            data[r['register_id']] = {
-                k: v for k, v in r.items()
-            }
-    return data
-
-
 DB = init_db(PATH)
 
 
@@ -127,14 +110,3 @@ def get_countries(direction: str, data=DB) -> dict:
             't_value': t_value,
         }
     return count_countries
-
-
-def custom_sort(data: dict, key: str) -> dict:
-    """
-    Custom sorts dict from key
-    """
-    return sorted(
-        data.items(),
-        reverse=True,
-        key=lambda item: item[-1][key]
-    )

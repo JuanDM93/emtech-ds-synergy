@@ -10,14 +10,7 @@ This is a data science demo built on [python](https://www.python.org/).
 
 ### Local python virtual environment
 
-Once cloned, create new [python environment](https://docs.python.org/3/tutorial/venv.html) "venv", then activate it
-
-```bash
-python -m venv venv
-source venv/bin/activate
-```
-
-Move into project directory, then run service
+Once cloned, make sure you have python 3 installed. Then, move into project directory, then run service
 
 ```bash
 python ANALISIS-02-DOMINGUEZ-JUAN.py

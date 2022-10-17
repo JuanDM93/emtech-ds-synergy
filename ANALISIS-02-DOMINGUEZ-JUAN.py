@@ -6,7 +6,6 @@ author: juan_dm93@hotmail.com
 from utils.frontend import login
 
 
-# main program
 def main():
     """
     login and report interface

@@ -4,13 +4,18 @@ Frontend module
 import os
 from time import sleep
 
-from .backend import get_directions, get_transported, get_countries, custom_sort
+from .utils import custom_sort
+from .backend import (
+    get_directions, get_transported, get_countries,
+)
 
 
 # LOCALS
 SLEEPING = 0.4
 PRINT_SIZE = 10
-ADMINS = [['admin', 'pass'], ]
+USERS = {
+    'admin': 'pass',
+}
 
 PROCESSES = ['directions', 'transports', 'countries']
 EXIT_CMDS = ['return', 'logout', 'exit']
@@ -28,10 +33,11 @@ def clear():
     os.system('clear')
 
 
-# Login
 def login(limit: int = 3):
     """
-    auth starter function
+    auth initial function
+
+    limit: max attempts
     """
     def ask() -> tuple:
         """
@@ -54,19 +60,16 @@ def login(limit: int = 3):
 
     while limit > 0:
         (user, password) = ask()
-        for admin in ADMINS:
-            if admin[0] == user and admin[-1] == password:
-                print_login()
-                # Start interface service
-                interface()
+        if user in USERS and USERS[user] == password:
+            print_login()
+            # Start interface service
+            interface()
         limit -= 1
         print_login(limit)
-
     # Failed logout
     print('... bye')
 
 
-# Main
 def interface():
     """
     Prints report options
@@ -76,8 +79,7 @@ def interface():
         print(separator)
         print('\nHey, what would you like to do?\n')
         response = print_options(PROCESSES)
-
-        # Process
+        # Run report process
         if response >= 0:
             print(separator)
             print(f'\nINFO: Running "{PROCESSES[response]}" process\n')
