@@ -4,13 +4,18 @@ Frontend module
 import os
 from time import sleep
 
-from .backend import get_directions, get_transported, get_countries, custom_sort
+from backend.utils import custom_sort
+from backend.services import (
+    get_directions, get_transported, get_countries,
+)
 
 
 # LOCALS
 SLEEPING = 0.4
 PRINT_SIZE = 10
-ADMINS = [['admin', 'pass'], ]
+USERS = {
+    'admin': 'pass',
+}
 
 PROCESSES = ['directions', 'transports', 'countries']
 EXIT_CMDS = ['return', 'logout', 'exit']
@@ -21,17 +26,18 @@ EXIT_CMDS = ['return', 'logout', 'exit']
 #################
 
 
-def clear():
+def clear_screen():
     """
     Clears screen
     """
     os.system('clear')
 
 
-# Login
 def login(limit: int = 3):
     """
-    auth starter function
+    auth initial function
+
+    limit: max attempts
     """
     def ask() -> tuple:
         """
@@ -50,23 +56,20 @@ def login(limit: int = 3):
         else:
             print('Login succesful!\n')
         sleep(SLEEPING)
-        clear()
+        clear_screen()
 
     while limit > 0:
         (user, password) = ask()
-        for admin in ADMINS:
-            if admin[0] == user and admin[-1] == password:
-                print_login()
-                # Start interface service
-                interface()
+        if user in USERS and USERS[user] == password:
+            print_login()
+            # Start interface service
+            interface()
         limit -= 1
         print_login(limit)
-
     # Failed logout
     print('... bye')
 
 
-# Main
 def interface():
     """
     Prints report options
@@ -76,14 +79,13 @@ def interface():
         print(separator)
         print('\nHey, what would you like to do?\n')
         response = print_options(PROCESSES)
-
-        # Process
+        # Run report process
         if response >= 0:
             print(separator)
             print(f'\nINFO: Running "{PROCESSES[response]}" process\n')
             sleep(SLEEPING)
             report(response)
-            clear()
+            clear_screen()
 
 
 def print_options(options: list) -> int:
@@ -119,7 +121,7 @@ def print_options(options: list) -> int:
 
     print(separator)
     sleep(SLEEPING)
-    clear()
+    clear_screen()
     return answer
 
 
@@ -130,7 +132,7 @@ def exit_status(answer: str) -> bool:
     if answer == EXIT_CMDS[-1]:
         exit()
     else:
-        clear()
+        clear_screen()
         if answer == EXIT_CMDS[1]:
             login()
             return True
@@ -150,7 +152,7 @@ def report(process_id: int = 0):
     """
     def wait_input():
         input('\nInput anything to return\n')
-        clear()
+        clear_screen()
 
     print('\nReading db...\n')
     if process_id == 0:
@@ -176,7 +178,7 @@ def options_loop(options: list) -> str:
     """
     response = print_options(options)
     while response < 0 or response > len(options):
-        clear()
+        clear_screen()
         response = print_options(options)
     return options[response]
 
