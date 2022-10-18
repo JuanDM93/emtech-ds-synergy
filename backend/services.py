@@ -1,9 +1,9 @@
 """
 Backend module
 """
-from utils.db import init_db
+from resources.db import init_db
 
-PATH = "utils/synergy_logistics_database.csv"
+PATH = "resources/synergy_logistics_database.csv"
 DB = init_db(PATH)
 
 
